@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full w-full overflow-hidden">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Multi-Link</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif'],
+                    },
+                    colors: {
+                        kick: '#00E701',
+                        youtube: '#FF0000',
+                        facebook: '#1877F2',
+                        playstore: '#00C853',
+                        cyber: {
+                            cyan: '#00f3ff',
+                            purple: '#b026ff',
+                            dark: '#0a0a12',
+                            card: 'rgba(18, 18, 30, 0.65)'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Deshabilitar desplazamiento total */
+        html, body {
+            height: 100%;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Neon Glow Utility Effects */
+        .neon-glow-cyan {
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.15);
+        }
+        
+        .neon-text-cyan {
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.7), 0 0 20px rgba(0, 243, 255, 0.4);
+        }
+
+        .neon-text-purple {
+            text-shadow: 0 0 8px rgba(176, 38, 255, 0.7), 0 0 20px rgba(176, 38, 255, 0.4);
+        }
+
+        /* Custom Glassmorphism Cards */
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: 0.5s;
+        }
+
+        .glass-card:active::before, .glass-card:hover::before {
+            left: 100%;
+        }
+
+        .glass-card:active {
+            transform: scale(0.97);
+        }
+
+        /* Individual Card Hover Glow Borders */
+        .card-kick:hover, .card-kick:active {
+            border-color: #00E701;
+            box-shadow: 0 0 20px rgba(0, 231, 1, 0.4);
+        }
+        .card-youtube:hover, .card-youtube:active {
+            border-color: #FF0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+        }
+        .card-facebook:hover, .card-facebook:active {
+            border-color: #1877F2;
+            box-shadow: 0 0 20px rgba(24, 119, 242, 0.4);
+        }
+        .card-playstore:hover, .card-playstore:active {
+            border-color: #00C853;
+            box-shadow: 0 0 20px rgba(0, 200, 83, 0.4);
+        }
+
+        /* Avatar Animated Spinning Ring */
+        @keyframes spinRing {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .avatar-ring {
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(135deg, #00f3ff, #b026ff, #00E701);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: spinRing 4s linear infinite;
+        }
+
+        /* Pulse Animation for Live Tag */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+        }
+
+        .live-pulse {
+            animation: pulseGlow 1.5s infinite ease-in-out;
+        }
+
+        /* Cyber grid Overlay */
+        .cyber-grid {
+            background-size: 30px 30px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="bg-cyber-dark text-white font-rajdhani flex items-center justify-center h-full w-full relative select-none">
+
+    <!-- Fondo de Partículas Dinámico Canvas -->
+    <canvas id="bg-canvas" class="absolute inset-0 w-full h-full z-0 pointer-events-none"></canvas>
+
+    <!-- Overlay de Rejilla Cyber y Viñeta -->
+    <div class="absolute inset-0 cyber-grid pointer-events-none z-0"></div>
+    <div class="absolute inset-0 bg-radial-vignette pointer-events-none z-0" style="background: radial-gradient(circle at center, transparent 40%, rgba(10, 10, 18, 0.9) 100%);"></div>
+
+    <!-- Contenedor Principal (Mobile View Frame) -->
+    <main class="relative z-10 w-full max-w-md h-full max-h-[100dvh] flex flex-col justify-between p-5 py-6 mx-auto">
+
+        <!-- Botón de Control de Audio Sound FX (Esquina superior derecha) -->
+        <header class="flex justify-between items-center w-full">
+            <div class="flex items-center space-x-2">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-kick live-pulse"></span>
+                <span class="font-orbitron text-xs tracking-widest text-gray-400 uppercase">SYSTEM ONLINE</span>
+            </div>
+            
+            <button id="sound-toggle" class="glass-card p-2.5 rounded-xl text-gray-300 hover:text-cyber-cyan transition-all duration-300 flex items-center justify-center" aria-label="Toggle Sound">
+                <i id="sound-icon" class="fa-solid fa-volume-high text-sm"></i>
+            </button>
+        </header>
+
+        <!-- Sección Header del Perfil Gamer -->
+        <section class="flex flex-col items-center text-center my-auto">
+            <!-- Contenedor del Avatar con Anillo Neón -->
+            <div class="relative w-24 h-24 sm:w-28 sm:h-28 mb-3 flex items-center justify-center">
+                <div class="avatar-ring"></div>
+                <!-- Foto de Perfil Gamer Avatar -->
+                <img src="https://i.postimg.cc/nh6WFSvz/image.png" 
+                     alt="Gamer Avatar" 
+                     class="w-full h-full rounded-full object-cover p-1 relative z-10 bg-cyber-dark">
+                <!-- Insignia de Verificado -->
+                <span class="absolute bottom-1 right-1 z-20 bg-cyber-cyan text-cyber-dark text-xs w-6 h-6 rounded-full flex items-center justify-center font-bold border-2 border-cyber-dark shadow-md" title="Verificado">
+                    <i class="fa-solid fa-check"></i>
+                </span>
+            </div>
+
+            <!-- Nombre de Usuario Cyber Style -->
+            <h1 class="font-orbitron font-extrabold text-2xl sm:text-3xl tracking-wider text-white neon-text-cyan flex items-center justify-center gap-2">
+                CK  <span class="text-cyber-purple text-xl">DAVID</span>
+            </h1>
+            
+            <!-- Rol / Subtítulo -->
+            <p class="text-xs sm:text-sm text-gray-400 font-semibold uppercase tracking-widest mt-1">
+                <i class="fa-solid fa-gamepad text-cyber-cyan mr-1"></i> Multienlace De Mis Redes
+            </p>
+
+            <!-- Status Indicator Badge -->
+            <div class="mt-2.5 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 border border-cyber-purple/40 backdrop-blur-md">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-cyan opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-cyber-cyan"></span>
+                </span>
+                <span class="text-xs font-orbitron text-gray-300 tracking-wide">STREAMING </span>
+            </div>
+        </section>
+
+        <!-- Lista de 4 Enlaces Exclusivos -->
+        <section class="w-full flex flex-col gap-3.5 my-auto">
+
+            <!-- 1. Kick Stream Link con Imagen Externa -->
+            <a href="https://kick.com/ckdavid27" target="_blank" rel="noopener noreferrer" 
+               class="link-card glass-card card-kick group flex items-center justify-between p-3.5 sm:p-4 rounded-2xl cursor-pointer">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-kick/10 border border-kick/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <!-- Logo de Kick desde URL externa -->
+                        <img src="https://i.postimg.cc/05c7d6Hg/images-removebg-preview.png" alt="Kick Logo" class="w-8 h-8 object-contain">
+                    </div>
+                    <div class="text-left">
+                        <div class="font-orbitron font-bold text-base text-white group-hover:text-kick transition-colors flex items-center gap-2">
+                            KICK 
+                            <span class="text-[10px] font-sans font-extrabold bg-kick text-black px-1.5 py-0.5 rounded tracking-tighter uppercase animate-pulse">DIRECTO</span>
+                        </div>
+                        <p class="text-xs text-gray-400">Transmisiones en Vivo & Chat</p>
+                    </div>
+                </div>
+                <div class="text-gray-500 group-hover:text-kick group-hover:translate-x-1 transition-all">
+                    <i class="fa-solid fa-chevron-right text-sm"></i>
+                </div>
+            </a>
+
+            <!-- 2. YouTube Channel Link -->
+            <a href="https://youtube.com/@ckdavid27?si=RBiJUxPzYu5wqztT" target="_blank" rel="noopener noreferrer" 
+               class="link-card glass-card card-youtube group flex items-center justify-between p-3.5 sm:p-4 rounded-2xl cursor-pointer">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-youtube/10 border border-youtube/30 flex items-center justify-center text-youtube text-xl group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-brands fa-youtube"></i>
+                    </div>
+                    <div class="text-left">
+                        <div class="font-orbitron font-bold text-base text-white group-hover:text-youtube transition-colors">YOUTUBE</div>
+                        <p class="text-xs text-gray-400">Gameplays, Shorts & Guías</p>
+                    </div>
+                </div>
+                <div class="text-gray-500 group-hover:text-youtube group-hover:translate-x-1 transition-all">
+                    <i class="fa-solid fa-chevron-right text-sm"></i>
+                </div>
+            </a>
+
+            <!-- 3. Facebook Page Link -->
+            <a href="https://www.facebook.com/share/1KLigUpoJm/" target="_blank" rel="noopener noreferrer" 
+               class="link-card glass-card card-facebook group flex items-center justify-between p-3.5 sm:p-4 rounded-2xl cursor-pointer">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-facebook/10 border border-facebook/30 flex items-center justify-center text-facebook text-xl group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </div>
+                    <div class="text-left">
+                        <div class="font-orbitron font-bold text-base text-white group-hover:text-facebook transition-colors">FACEBOOK</div>
+                        <p class="text-xs text-gray-400">Comunidad, Clips & Memes</p>
+                    </div>
+                </div>
+                <div class="text-gray-500 group-hover:text-facebook group-hover:translate-x-1 transition-all">
+                    <i class="fa-solid fa-chevron-right text-sm"></i>
+                </div>
+            </a>
+
+            <!-- 4. Play Store App Link -->
+            <a href="https://play.google.com/store/apps/details?id=zona.gamerssensiinzana" target="_blank" rel="noopener noreferrer" 
+               class="link-card glass-card card-playstore group flex items-center justify-between p-3.5 sm:p-4 rounded-2xl cursor-pointer">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-playstore/10 border border-playstore/30 flex items-center justify-center text-playstore text-xl group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-brands fa-google-play"></i>
+                    </div>
+                    <div class="text-left">
+                        <div class="font-orbitron font-bold text-base text-white group-hover:text-playstore transition-colors">GENERADOR DE SENSIS</div>
+                        <p class="text-xs text-gray-400">Descarga en Google Play Store</p>
+                    </div>
+                </div>
+                <div class="text-gray-500 group-hover:text-playstore group-hover:translate-x-1 transition-all">
+                    <i class="fa-solid fa-download text-sm"></i>
+                </div>
+            </a>
+
+        </section>
+
+        <!-- Footer / Creditos Gamer -->
+        <footer class="text-center w-full pt-2">
+            <p class="text-[11px] font-orbitron tracking-widest text-gray-500 uppercase">
+                &copy; <span id="year"></span> CK DAVID &bull; DERECHOS RESERVADOS
+            </p>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript para Animaciones y Sonido Synth Cyber -->
+    <script>
+        // Establecer año actual
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        /* ===================================================
+           1. Web Audio API - Efectos de Sonido Futuristas
+           =================================================== */
+        let audioCtx = null;
+        let isMuted = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Sonido de Click Futurista sintetizado con OscillatorNode
+        function playCyberSound(freq = 600, type = 'sine', duration = 0.08) {
+            if (isMuted) return;
+            try {
+                initAudio();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + duration);
+
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                console.log("Audio API support limited");
+            }
+        }
+
+        // Toggle Silenciar Audio
+        const soundBtn = document.getElementById('sound-toggle');
+        const soundIcon = document.getElementById('sound-icon');
+
+        soundBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isMuted = !isMuted;
+            if (isMuted) {
+                soundIcon.className = "fa-solid fa-volume-xmark text-sm text-red-400";
+            } else {
+                soundIcon.className = "fa-solid fa-volume-high text-sm text-cyber-cyan";
+                playCyberSound(800, 'triangle', 0.1);
+            }
+        });
+
+        // Asignar efectos de sonido a cada enlace
+        const linkCards = document.querySelectorAll('.link-card');
+        linkCards.forEach(card => {
+            card.addEventListener('mouseenter', () => playCyberSound(400, 'sine', 0.05));
+            card.addEventListener('click', () => playCyberSound(800, 'sawtooth', 0.12));
+        });
+
+
+        /* ===================================================
+           2. Canvas Animado: Partículas Cyber & Red de Luz
+           =================================================== */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+        const particleCount = 45;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.6;
+                this.vy = (Math.random() - 0.5) * 0.6;
+                this.radius = Math.random() * 2 + 1;
+                
+                // Colores Neón Cyber Random
+                const colors = ['#00f3ff', '#b026ff', '#00E701', '#1877F2'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.alpha = Math.random() * 0.6 + 0.2;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Rebotar o reaparecer en los bordes
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Inicializar Partículas
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        // Conectar Partículas cercanas con líneas estilo Red Neón
+        function drawNetworkLines() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 110) {
+                        ctx.save();
+                        ctx.globalAlpha = (1 - dist / 110) * 0.25;
+                        ctx.strokeStyle = particles[i].color;
+                        ctx.lineWidth = 0.8;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+            }
+        }
+
+        // Loop de Animación Continuo
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            drawNetworkLines();
+            requestAnimationFrame(animate);
+        }
+
+        window.onload = () => {
+            animate();
+        };
+    </script>
+</body>
+</html>
